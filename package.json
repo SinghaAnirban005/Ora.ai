@@ -1,5 +1,5 @@
 {
-  "name": "ora.ai",
+  "name": "@singhaanirban/ora.ai",
   "version": "1.0.0",
   "description": "AI powered error explainer that intercepts console.error and uncaught exceptions and prints beautiful, color coded diagnoses right in your terminal.",
   "main": "dist/index.js",

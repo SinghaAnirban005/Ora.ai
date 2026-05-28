@@ -57,7 +57,7 @@ export interface ConsoleAIConfig {
 
   /**
    * Custom header label shown in the AI box.
-   * @default "console.ai"
+   * @default "ora.ai"
    */
   label?: string;
 

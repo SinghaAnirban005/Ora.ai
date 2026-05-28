@@ -23,7 +23,7 @@ export async function buildModel(
   if (provider === "anthropic") {
     const { createAnthropic } = await import("@ai-sdk/anthropic");
     const key = (apiKey || undefined) ?? process.env["ANTHROPIC_API_KEY"];
-    if (!key) throw new Error("[console.ai] ANTHROPIC_API_KEY is not set.");
+    if (!key) throw new Error("[ora.ai] ANTHROPIC_API_KEY is not set.");
     const anthropic = createAnthropic({ apiKey: key });
     return { id: modelId, languageModel: anthropic(modelId) };
   }
@@ -31,7 +31,7 @@ export async function buildModel(
   if (provider === "openai") {
     const { createOpenAI } = await import("@ai-sdk/openai");
     const key = (apiKey || undefined) ?? process.env["OPENAI_API_KEY"];
-    if (!key) throw new Error("[console.ai] OPENAI_API_KEY is not set.");
+    if (!key) throw new Error("[ora.ai] OPENAI_API_KEY is not set.");
     const openai = createOpenAI({ apiKey: key });
     return { id: modelId, languageModel: openai(modelId) };
   }
@@ -45,5 +45,5 @@ export async function buildModel(
     return { id: modelId, languageModel: ollama(modelId) };
   }
 
-  throw new Error(`[console.ai] Unknown provider: ${provider as string}`);
+  throw new Error(`[ora.ai] Unknown provider: ${provider as string}`);
 }

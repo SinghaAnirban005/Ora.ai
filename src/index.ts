@@ -12,21 +12,21 @@ const DEFAULTS: Required<ConsoleAIConfig> = {
   scrubPatterns: [],
   maxStackLength: 3000,
   showRawError: true,
-  label: "console.ai",
+  label: "ora.ai",
   silent: false,
 };
 
 /**
- * Initialise console.ai.
+ * Initialise ora.ai.
  *
  * @example
  * // ESM
- * import { init } from "console.ai";
+ * import { init } from "ora.ai";
  * init({ provider: "anthropic" });
  *
  * @example
  * // CJS
- * const { init } = require("console.ai");
+ * const { init } = require("ora.ai");
  * init({ provider: "openai" });
  */
 export function init(userConfig: ConsoleAIConfig = {}): ConsoleAI {
@@ -38,7 +38,7 @@ export function init(userConfig: ConsoleAIConfig = {}): ConsoleAI {
   ) {
     process.stderr.write(
       chalk.yellowBright(
-        "[console.ai] Warning: running in NODE_ENV=production. Consider enabling only in development.\n"
+        "[ora.ai] Warning: running in NODE_ENV=production. Consider enabling only in development.\n"
       )
     );
   }

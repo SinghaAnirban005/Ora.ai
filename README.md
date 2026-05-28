@@ -1,6 +1,7 @@
-# Ora.ai ✦
+# Ora.ai
 
-> AI-powered error explainer. Catches your runtime errors and prints beautiful, colour-coded diagnoses right in your terminal — no tab-switching required.
+> AI powered error explainer. Catches your runtime errors and prints beautiful, colour coded diagnoses right in your terminal 
+no tab switching required.
 
 ```
 ╭────────────────────────────────────────────────────────╮
@@ -27,9 +28,9 @@
 ## Install
 
 ```bash
-npm install console.ai
+npm install @singhaanirban/ora.ai
 # or
-pnpm add console.ai
+pnpm add @singhaanirban/ora.ai
 ```
 
 ---
@@ -128,7 +129,7 @@ ai.restore();
 
 ## Privacy & security
 
-Before any text is sent to an AI model, `console.ai` automatically redacts:
+Before any text is sent to an AI model, `ora.ai` automatically redacts:
 
 - Absolute file paths (`/home/user/…`, `C:\Users\…`)
 - Bearer / Authorization tokens
@@ -145,7 +146,7 @@ You can add extra patterns via `scrubPatterns`.
 
 ## Only in development
 
-`console.ai` logs a warning if `NODE_ENV=production`. We recommend guarding the call:
+`ora.ai` logs a warning if `NODE_ENV=production`. We recommend guarding the call:
 
 ```ts
 if (process.env.NODE_ENV !== "production") {
