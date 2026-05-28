@@ -86,7 +86,6 @@ export function formatSpinner(label: string): string {
   return chalk.dim(`  ⟳ ${label} is thinking…`);
 }
 
-
 function wrapText(text: string, width: number): string {
   const words = text.split(" ");
   const lines: string[] = [];

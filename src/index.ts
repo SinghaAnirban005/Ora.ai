@@ -3,59 +3,49 @@ import { analyseError } from "./analyser.js";
 import type { ConsoleAIConfig, ConsoleAI } from "./types.js";
 
 const DEFAULTS: Required<ConsoleAIConfig> = {
-  provider: "anthropic",
   model: "",
   apiKey: "",
-  baseURL: "",
   interceptConsoleError: true,
   interceptUncaught: true,
   scrubPatterns: [],
   maxStackLength: 3000,
   showRawError: true,
-  label: "ora.ai",
+  label: "Ora.ai",
   silent: false,
 };
 
 /**
- * Initialise ora.ai.
+ * Initialise Ora.ai with Groq.
  *
  * @example
- * // ESM
- * import { init } from "ora.ai";
- * init({ provider: "anthropic" });
+ * import { init } from "@singhaanirban/ora.ai";
+ * init(); // reads GROQ_API_KEY from env
  *
  * @example
- * // CJS
- * const { init } = require("ora.ai");
- * init({ provider: "openai" });
+ * init({ model: "llama-3.1-8b-instant", apiKey: process.env.MY_GROQ_KEY });
  */
 export function init(userConfig: ConsoleAIConfig = {}): ConsoleAI {
-  const config = { ...DEFAULTS, ...userConfig } as Required<ConsoleAIConfig>;
+  const config: Required<ConsoleAIConfig> = { ...DEFAULTS, ...userConfig };
 
-  if (
-    process.env["NODE_ENV"] === "production" &&
-    !userConfig.silent
-  ) {
+  if (process.env["NODE_ENV"] === "production" && !config.silent) {
     process.stderr.write(
       chalk.yellowBright(
-        "[ora.ai] Warning: running in NODE_ENV=production. Consider enabling only in development.\n"
+        "[Ora.ai] Warning: running in NODE_ENV=production. " +
+          "Consider enabling only in development.\n"
       )
     );
   }
 
   const originalConsoleError = console.error.bind(console);
-
   let busy = false;
 
   async function handle(error: unknown, rawArgs?: unknown[]): Promise<void> {
     if (busy || config.silent) return;
     busy = true;
-
     try {
       if (config.showRawError && rawArgs) {
         originalConsoleError(...rawArgs);
       }
-
       const output = await analyseError(error, config);
       process.stderr.write(output + "\n");
     } finally {
@@ -63,7 +53,6 @@ export function init(userConfig: ConsoleAIConfig = {}): ConsoleAI {
     }
   }
 
-  // intercept console.error
   if (config.interceptConsoleError) {
     console.error = (...args: unknown[]) => {
       const error = args.find((a) => a instanceof Error) ?? args[0];
@@ -71,41 +60,28 @@ export function init(userConfig: ConsoleAIConfig = {}): ConsoleAI {
     };
   }
 
-  // intercept uncaught exceptions
   let uncaughtHandler: ((err: Error) => void) | undefined;
-  let unhandledRejectionHandler:
-    | ((reason: unknown) => void)
-    | undefined;
+  let rejectionHandler: ((reason: unknown) => void) | undefined;
 
   if (config.interceptUncaught) {
-    uncaughtHandler = (err: Error) => {
-      void handle(err);
-    };
-    unhandledRejectionHandler = (reason: unknown) => {
-      void handle(reason);
-    };
+    uncaughtHandler = (err: Error) => void handle(err);
+    rejectionHandler = (reason: unknown) => void handle(reason);
 
     process.on("uncaughtException", uncaughtHandler);
-    process.on("unhandledRejection", unhandledRejectionHandler);
+    process.on("unhandledRejection", rejectionHandler);
   }
 
-  const instance: ConsoleAI = {
+  return {
     async analyse(error: unknown): Promise<string> {
       return analyseError(error, config);
     },
 
     restore() {
       console.error = originalConsoleError;
-      if (uncaughtHandler) {
-        process.off("uncaughtException", uncaughtHandler);
-      }
-      if (unhandledRejectionHandler) {
-        process.off("unhandledRejection", unhandledRejectionHandler);
-      }
+      if (uncaughtHandler) process.off("uncaughtException", uncaughtHandler);
+      if (rejectionHandler) process.off("unhandledRejection", rejectionHandler);
     },
   };
-
-  return instance;
 }
 
-export type { ConsoleAIConfig, ConsoleAI, ErrorAnalysis } from "./types.js";
+export type { ConsoleAIConfig, ConsoleAI, ErrorAnalysis, GroqModel } from "./types.js";

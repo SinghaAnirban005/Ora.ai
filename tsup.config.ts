@@ -9,11 +9,12 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   minify: false,
-  external: ["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"],
+  // Bundle groq-sdk; keep Node built-ins external
+  noExternal: ["groq-sdk"],
   banner: {
     js: `/**
- * console.ai - AI-powered DevTools Error Assistant
- * https://www.npmjs.com/package/console.ai
+ * Ora.ai — AI-powered DevTools Error Assistant (Groq-powered)
+ * https://www.npmjs.com/package/ora.ai
  */`,
   },
 });

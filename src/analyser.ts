@@ -1,12 +1,7 @@
-import { generateText } from "ai";
+import { buildGroqClient } from "./provider.js";
 import { scrub } from "./scrubber.js";
 import { buildPrompt } from "./prompt.js";
-import { buildModel } from "./provider.js";
-import {
-  formatAnalysis,
-  formatError,
-  formatSpinner,
-} from "./formatter.js";
+import { formatAnalysis, formatError, formatSpinner } from "./formatter.js";
 import type { ConsoleAIConfig, ErrorAnalysis } from "./types.js";
 
 export async function analyseError(
@@ -14,7 +9,6 @@ export async function analyseError(
   config: Required<ConsoleAIConfig>
 ): Promise<string> {
   const raw = serialiseError(error, config.maxStackLength);
-
   const cleaned = scrub(raw, config.scrubPatterns);
 
   if (!config.silent) {
@@ -23,24 +17,25 @@ export async function analyseError(
 
   let responseText: string;
   try {
-    const { languageModel } = await buildModel(
-      config.provider,
-      config.model,
-      config.apiKey,
-      config.baseURL
-    );
+    const { client, model } = buildGroqClient(config.model, config.apiKey);
 
-    const { text } = await generateText({
-      model: languageModel,
-      prompt: buildPrompt(cleaned),
-    //   maxTokens: 800,
+    const completion = await client.chat.completions.create({
+      model,
+      messages: [{ role: "user", content: buildPrompt(cleaned) }],
+      max_tokens: 800,
       temperature: 0.2,
+      response_format: { type: "json_object" },
     });
-    responseText = text;
+
+    responseText = completion.choices[0]?.message?.content ?? "";
   } catch (aiErr) {
-    const msg =
-      aiErr instanceof Error ? aiErr.message : String(aiErr);
+    if (!config.silent) process.stderr.write("\x1b[1A\x1b[2K");
+    const msg = aiErr instanceof Error ? aiErr.message : String(aiErr);
     return formatError(config.label, msg);
+  }
+
+  if (!config.silent) {
+    process.stderr.write("\x1b[1A\x1b[2K");
   }
 
   let analysis: ErrorAnalysis;
@@ -57,10 +52,6 @@ export async function analyseError(
     );
   }
 
-  if (!config.silent) {
-    process.stderr.write("\x1b[1A\x1b[2K");
-  }
-
   return formatAnalysis(analysis, config.label);
 }
 
@@ -68,11 +59,7 @@ function serialiseError(error: unknown, maxLength: number): string {
   if (error instanceof Error) {
     const parts: string[] = [`${error.name}: ${error.message}`];
     if (error.stack) {
-
-      const traceLines = error.stack
-        .split("\n")
-        .slice(1)
-        .join("\n");
+      const traceLines = error.stack.split("\n").slice(1).join("\n");
       parts.push(traceLines);
     }
 
@@ -85,6 +72,7 @@ function serialiseError(error: unknown, maxLength: number): string {
   }
 
   if (typeof error === "string") return error.slice(0, maxLength);
+
   try {
     return JSON.stringify(error, null, 2).slice(0, maxLength);
   } catch {

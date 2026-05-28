@@ -1,29 +1,29 @@
-export type SupportedProvider = "anthropic" | "openai" | "ollama";
+/**
+ * Groq model IDs available on the free tier.
+ * @see https://console.groq.com/docs/models
+ */
+export type GroqModel =
+  | "llama-3.3-70b-versatile"
+  | "llama-3.1-8b-instant"
+  | "llama3-70b-8192"
+  | "llama3-8b-8192"
+  | "mixtral-8x7b-32768"
+  | "gemma2-9b-it"
+  | (string & {});
 
 export interface ConsoleAIConfig {
   /**
-   * AI provider to use.
-   * @default "anthropic"
+   * Groq model to use.
+   * @default "llama-3.3-70b-versatile"
+   * @see https://console.groq.com/docs/models
    */
-  provider?: SupportedProvider;
+  model?: GroqModel;
 
   /**
-   * Model string to use with the provider.
-   * @default provider-specific default (e.g. "claude-3-5-haiku-20241022" for Anthropic)
-   */
-  model?: string;
-
-  /**
-   * API key for cloud providers. Falls back to env vars:
-   * ANTHROPIC_API_KEY, OPENAI_API_KEY
+   * Groq API key. Falls back to the GROQ_API_KEY environment variable.
+   * Get one free at https://console.groq.com
    */
   apiKey?: string;
-
-  /**
-   * Base URL for local providers like Ollama.
-   * @default "http://localhost:11434/api"
-   */
-  baseURL?: string;
 
   /**
    * Whether to intercept console.error calls.
@@ -38,8 +38,8 @@ export interface ConsoleAIConfig {
   interceptUncaught?: boolean;
 
   /**
-   * Custom patterns to scrub from error messages before sending to the model.
-   * Each entry is a regex or string that will be replaced with "[REDACTED]".
+   * Custom patterns to scrub from error messages before sending to Groq.
+   * Each entry is a regex or string replaced with "[REDACTED]".
    */
   scrubPatterns?: Array<RegExp | string>;
 
@@ -50,14 +50,14 @@ export interface ConsoleAIConfig {
   maxStackLength?: number;
 
   /**
-   * Whether to show the raw error before the AI analysis box.
+   * Whether to print the original error above the AI analysis box.
    * @default true
    */
   showRawError?: boolean;
 
   /**
    * Custom header label shown in the AI box.
-   * @default "ora.ai"
+   * @default "Ora.ai"
    */
   label?: string;
 
@@ -76,8 +76,6 @@ export interface ErrorAnalysis {
 }
 
 export interface ConsoleAI {
-  /** Manually analyse an error (returns formatted string). */
   analyse(error: unknown): Promise<string>;
-  /** Stop intercepting errors and restore original handlers. */
   restore(): void;
 }
