@@ -1,4 +1,4 @@
-# Ora.ai ✦
+# Ora.ai
 
 > AI powered error explainer intercepts `console.error` and uncaught exceptions and prints beautiful, colour coded diagnoses right in your terminal. **No tab-switching. No copy-pasting. No paid API credits.**
 
@@ -42,7 +42,6 @@ pnpm add @singhaanirban/ora.ai
 2. Add it to your environment:
 
 ```bash
-# .env / .env.local
 GROQ_API_KEY=gsk_...
 ```
 
@@ -50,7 +49,7 @@ GROQ_API_KEY=gsk_...
 
 ```ts
 import { init } from "@singhaanirban/ora.ai";
-init(); // reads GROQ_API_KEY automatically
+init();
 ```
 
 That's it. Every `console.error(err)` and every uncaught exception / unhandled rejection now shows a beautiful AI diagnosis box.
