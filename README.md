@@ -4,6 +4,10 @@
 
 Powered by **[Groq](https://console.groq.com)** — the fastest LLM inference API available, with a generous **free tier**.
 
+
+<img width="800" height="467" alt="demo_1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a189c52f-29d1-452a-8c11-4591665d575c" />
+
+
 ```
 ╭────────────────────────────────────────────────────────╮
 │  ✦ Ora.ai  ● high confidence                           │
